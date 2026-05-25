@@ -9,7 +9,12 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-- **Close**: `gh issue close <number> --comment "..."`
+- **Close**: `gh issue close <number> --comment "..."`. Before closing, tick every `- [ ]` acceptance-criteria checkbox in the body to `- [x]` so GitHub shows the task-list as 100% complete. One-shot:
+  ```bash
+  gh issue edit <n> --body "$(gh issue view <n> --json body --jq .body | sed 's/^- \[ \]/- [x]/')"
+  gh issue close <n> --comment "..."
+  ```
+  Only tick boxes whose work was actually delivered — if an acceptance item slipped, leave it unticked and call it out in the close comment.
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
