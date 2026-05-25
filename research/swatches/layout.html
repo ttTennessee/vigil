@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>vigil · layout mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:           #181410;
+    --bg-elev:      #1f1a16;    /* slight lift for the middle column when in drawer mode */
+    --fg:           #e8e1d3;
+    --fg-muted:     rgba(232, 225, 211, 0.45);
+    --fg-faint:     rgba(232, 225, 211, 0.18);
+    --fg-ghost:     rgba(232, 225, 211, 0.08);
+    --hairline:     rgba(232, 225, 211, 0.08);
+    --hairline-strong: rgba(232, 225, 211, 0.14);
+
+    --accent:       #d4a04f;
+    --success:      #7d9070;
+    --failure:      #c46856;
+
+    --display: 'Fraunces', serif;
+    --mono:    'IBM Plex Mono', ui-monospace, monospace;  /* stand-in for Commit Mono */
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0907;
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Each .screen is one mockup panel — actual viewport size, framed */
+  .screen-wrap {
+    padding: 48px 32px 16px;
+  }
+  .screen-label {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14, 'SOFT' 0;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 12px;
+  }
+  .screen-label .hint {
+    font-family: var(--mono);
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: var(--fg-faint);
+    margin-left: 12px;
+  }
+  .screen {
+    width: 1280px;
+    max-width: 100%;
+    height: 720px;
+    border: 1px solid var(--hairline-strong);
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 100;
+  }
+
+  /* ────────────────────────  TOP BAR  ──────────────────────── */
+  .topbar {
+    height: 64px;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border-bottom: 1px solid var(--hairline);
+    position: relative;
+    z-index: 2;
+  }
+  .brand {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 24, 'SOFT' 60, 'WONK' 1;
+    font-weight: 400;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+  .brand-dot {
+    color: var(--fg-faint);
+    margin: 0 12px;
+    font-weight: 300;
+  }
+  .project-path {
+    color: var(--fg-muted);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .phase-title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 24, 'SOFT' 40;
+    font-size: 17px;
+    color: var(--fg);
+    margin-left: auto;
+    margin-right: 24px;
+  }
+  .next-action {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .next-action .glyph { font-size: 10px; }
+
+  /* ────────────────────────  TWO-COLUMN BODY  ──────────────────────── */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    height: calc(100% - 64px);
+  }
+
+  /* Left: stages */
+  .stages {
+    padding: 28px 0 28px 0;
+    border-right: 1px solid var(--hairline);
+    position: relative;
+  }
+  .stages-label {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    padding: 0 28px 16px;
+  }
+  .stage {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 28px;
+    font-size: 13px;
+    color: var(--fg-muted);
+    position: relative;
+    cursor: pointer;
+  }
+  .stage .glyph {
+    font-family: var(--mono);
+    font-size: 13px;
+    width: 14px;
+    text-align: center;
+  }
+  .stage.done { color: var(--fg-muted); }
+  .stage.done .glyph { color: var(--success); opacity: 0.7; }
+  .stage.current {
+    color: var(--fg);
+    background: rgba(212, 160, 79, 0.04);
+  }
+  .stage.current::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--accent);
+  }
+  .stage.current .glyph { color: var(--accent); }
+  .stage.pending { color: var(--fg-faint); }
+  .stage.pending .glyph { color: var(--fg-faint); }
+
+  /* Right: main content */
+  .main {
+    padding: 28px 36px 28px 32px;
+    overflow-y: auto;
+  }
+
+  .wave-label {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--hairline);
+    margin-top: 22px;
+  }
+  .wave-label:first-child { margin-top: 0; }
+
+  .plan {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--fg-ghost);
+  }
+  .plan:last-child { border-bottom: none; }
+  .plan .glyph {
+    font-family: var(--mono);
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .plan.done    .glyph { color: var(--success); }
+  .plan.running .glyph { color: var(--accent); }
+  .plan.pending .glyph { color: var(--fg-faint); }
+  .plan.failed  .glyph { color: var(--failure); }
+
+  .plan-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    letter-spacing: 0.04em;
+    width: 56px;
+    flex-shrink: 0;
+  }
+  .plan-name {
+    flex: 1;
+    color: var(--fg);
+  }
+  .plan.done .plan-name { color: var(--fg-muted); }
+  .plan.pending .plan-name { color: var(--fg-faint); }
+
+  .plan-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 2px;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .chip.amber {
+    color: var(--accent);
+    border-color: rgba(212, 160, 79, 0.28);
+  }
+  .chip.amber.stale {
+    color: var(--failure);
+    border-color: rgba(196, 104, 86, 0.32);
+  }
+  .chip.human {
+    color: var(--accent);
+    border-color: rgba(212, 160, 79, 0.22);
+  }
+  .chip.failure {
+    color: var(--failure);
+    border-color: rgba(196, 104, 86, 0.35);
+    cursor: pointer;
+  }
+  .chip.req {
+    font-size: 10px;
+    color: var(--fg-faint);
+    border-color: var(--hairline);
+  }
+  .chip-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .files-hint {
+    font-size: 10.5px;
+    color: var(--fg-faint);
+    letter-spacing: 0.02em;
+  }
+
+  /* Phase summary chip in top bar (failures count) */
+  .phase-summary-chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    color: var(--failure);
+    border: 1px solid rgba(196, 104, 86, 0.32);
+    border-radius: 2px;
+    margin-left: 16px;
+    cursor: pointer;
+  }
+
+  /* ────────────────────────  DRAWER VIEW  ──────────────────────── */
+  /* When a non-execute stage is selected, .main shows artifact preview */
+  .drawer {
+    padding: 32px 40px;
+    background: var(--bg-elev);
+    height: 100%;
+    overflow-y: auto;
+  }
+  .drawer-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .drawer-title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 36, 'SOFT' 60, 'WONK' 0;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .drawer-meta {
+    font-size: 11px;
+    color: var(--fg-faint);
+    letter-spacing: 0.03em;
+  }
+  .frontmatter-card {
+    background: var(--bg);
+    border: 1px solid var(--hairline);
+    padding: 14px 18px;
+    margin: 16px 0 24px;
+    border-radius: 2px;
+  }
+  .frontmatter-card .fm-label {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 8px;
+  }
+  .frontmatter-card .fm-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    row-gap: 4px;
+    column-gap: 16px;
+    font-size: 12px;
+  }
+  .frontmatter-card .fm-key { color: var(--fg-muted); }
+  .frontmatter-card .fm-val { color: var(--fg); }
+
+  .md-body {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--fg);
+    max-width: 720px;
+  }
+  .md-body h3 {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 24, 'SOFT' 40;
+    font-weight: 500;
+    font-size: 17px;
+    margin: 24px 0 8px;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .md-body p { margin: 0 0 12px; color: var(--fg); }
+  .md-body ul { margin: 0 0 16px; padding-left: 20px; }
+  .md-body li { color: var(--fg); margin-bottom: 4px; }
+  .md-body .file-ref {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(212, 160, 79, 0.4);
+    cursor: pointer;
+  }
+  .md-body .task-callout {
+    border-left: 2px solid var(--accent);
+    padding: 12px 16px;
+    background: rgba(212, 160, 79, 0.04);
+    margin: 12px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .md-body .task-callout .task-name {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .drawer-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--fg-muted);
+  }
+  .drawer-footer .truncated { color: var(--fg-muted); }
+  .drawer-footer .open-editor {
+    color: var(--accent);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .drawer-footer .copy-path {
+    color: var(--fg-faint);
+    margin-left: 12px;
+    cursor: pointer;
+  }
+
+  /* ────────────────────────  EMPTY STATE  ──────────────────────── */
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 64px);
+    padding: 0 32px;
+  }
+  .empty-content {
+    max-width: 540px;
+    text-align: left;
+  }
+  .empty-title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 48, 'SOFT' 80, 'WONK' 1;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.2;
+    color: var(--fg);
+    margin-bottom: 16px;
+    letter-spacing: -0.015em;
+  }
+  .empty-sub {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14, 'SOFT' 60;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--fg-muted);
+    margin-bottom: 32px;
+  }
+  .empty-evidence {
+    border-top: 1px solid var(--hairline);
+    padding-top: 16px;
+  }
+  .empty-evidence .ev-label {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 14;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 12px;
+  }
+  .ev-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 12.5px;
+  }
+  .ev-row.has { color: var(--fg); }
+  .ev-row.miss { color: var(--fg-faint); }
+  .ev-row .ev-glyph {
+    font-family: var(--mono);
+    width: 14px;
+  }
+  .ev-row.has .ev-glyph { color: var(--success); }
+  .empty-hint {
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+  .empty-hint code {
+    font-family: var(--mono);
+    color: var(--accent);
+    background: rgba(212, 160, 79, 0.06);
+    padding: 1px 6px;
+    border-radius: 2px;
+    border: 1px solid rgba(212, 160, 79, 0.18);
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+  SCREEN 1 — DEFAULT EXECUTE VIEW
+══════════════════════════════════════════════════════════════ -->
+<div class="screen-wrap">
+  <div class="screen-label">screen 1 · default · execute stage selected <span class="hint">(the most common state at morning-open)</span></div>
+  <div class="screen">
+
+    <div class="topbar">
+      <span class="brand">vigil</span>
+      <span class="brand-dot">·</span>
+      <span class="project-path">~/project/foo</span>
+      <span class="phase-title">Phase 4.5 — Code Quality</span>
+      <span class="phase-summary-chip">1 plan failed</span>
+      <span class="next-action"><span class="glyph">▶</span> next: /gsd-execute-phase 4.5</span>
+    </div>
+
+    <div class="body-grid">
+
+      <!-- Stages column -->
+      <aside class="stages">
+        <div class="stages-label">Stages</div>
+        <div class="stage done"><span class="glyph">✓</span>discuss</div>
+        <div class="stage done"><span class="glyph">✓</span>ui</div>
+        <div class="stage done"><span class="glyph">✓</span>plan</div>
+        <div class="stage current"><span class="glyph">●</span>execute</div>
+        <div class="stage pending"><span class="glyph">○</span>verify</div>
+        <div class="stage pending"><span class="glyph">○</span>ui-review</div>
+      </aside>
+
+      <!-- Plans column -->
+      <main class="main">
+        <div class="wave-label">Wave 1</div>
+        <div class="plan done">
+          <span class="glyph">✓</span>
+          <span class="plan-id">4.5-01</span>
+          <span class="plan-name">extract-parser</span>
+          <span class="plan-meta">
+            <span class="chip req">[LOC-01]</span>
+            <span class="files-hint">3 files</span>
+          </span>
+        </div>
+        <div class="plan done">
+          <span class="glyph">✓</span>
+          <span class="plan-id">4.5-02</span>
+          <span class="plan-name">add-types</span>
+          <span class="plan-meta">
+            <span class="chip req">[LOC-01]</span>
+            <span class="files-hint">2 files</span>
+          </span>
+        </div>
+
+        <div class="wave-label">Wave 2</div>
+        <div class="plan running">
+          <span class="glyph">◐</span>
+          <span class="plan-id">4.5-03</span>
+          <span class="plan-name">refactor-state</span>
+          <span class="plan-meta">
+            <span class="chip amber">running · 12s ago</span>
+            <span class="files-hint">5 files</span>
+          </span>
+        </div>
+        <div class="plan pending">
+          <span class="glyph">○</span>
+          <span class="plan-id">4.5-04</span>
+          <span class="plan-name">wire-up</span>
+          <span class="plan-meta">
+            <span class="chip human">🪧 human checkpoint</span>
+            <span class="files-hint">4 files</span>
+          </span>
+        </div>
+
+        <div class="wave-label">Wave 3</div>
+        <div class="plan failed">
+          <span class="glyph">✗</span>
+          <span class="plan-id">4.5-05</span>
+          <span class="plan-name">tests</span>
+          <span class="plan-meta">
+            <span class="chip failure">self-check failed →</span>
+            <span class="files-hint">8 files</span>
+          </span>
+        </div>
+        <div class="plan pending">
+          <span class="glyph">○</span>
+          <span class="plan-id">4.5-06</span>
+          <span class="plan-name">cleanup</span>
+          <span class="plan-meta">
+            <span class="files-hint">2 files</span>
+          </span>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+  SCREEN 2 — DRAWER OPEN (DISCUSS STAGE CLICKED)
+══════════════════════════════════════════════════════════════ -->
+<div class="screen-wrap">
+  <div class="screen-label">screen 2 · discuss stage clicked <span class="hint">(middle column swaps to artifact view; left column stays visible — not a modal)</span></div>
+  <div class="screen">
+
+    <div class="topbar">
+      <span class="brand">vigil</span>
+      <span class="brand-dot">·</span>
+      <span class="project-path">~/project/foo</span>
+      <span class="phase-title">Phase 4.5 — Code Quality</span>
+      <span class="phase-summary-chip">1 plan failed</span>
+      <span class="next-action"><span class="glyph">▶</span> next: /gsd-execute-phase 4.5</span>
+    </div>
+
+    <div class="body-grid">
+
+      <aside class="stages">
+        <div class="stages-label">Stages</div>
+        <div class="stage current"><span class="glyph">✓</span>discuss</div>
+        <div class="stage done"><span class="glyph">✓</span>ui</div>
+        <div class="stage done"><span class="glyph">✓</span>plan</div>
+        <div class="stage done"><span class="glyph">●</span>execute</div>
+        <div class="stage pending"><span class="glyph">○</span>verify</div>
+        <div class="stage pending"><span class="glyph">○</span>ui-review</div>
+      </aside>
+
+      <div class="drawer">
+        <div class="drawer-head">
+          <span class="drawer-title">04-CONTEXT.md</span>
+          <span class="drawer-meta">written 2026-05-12 · 4.2KB · 87 lines</span>
+        </div>
+
+        <div class="frontmatter-card">
+          <div class="fm-label">Frontmatter</div>
+          <div class="fm-grid">
+            <span class="fm-key">phase</span><span class="fm-val">04-cabinet-layout</span>
+            <span class="fm-key">type</span><span class="fm-val">discuss</span>
+            <span class="fm-key">decisions</span><span class="fm-val">7</span>
+            <span class="fm-key">stakeholders</span><span class="fm-val">jyj, designer</span>
+          </div>
+        </div>
+
+        <div class="md-body">
+          <h3>Phase Context: Code Quality Pass</h3>
+          <p>
+            This phase consolidates the parser layer and removes the historic
+            <a class="file-ref">@.planning/PROJECT.md</a> coupling that snuck
+            into the execute path during phase 4.2. The aim is a clean cut —
+            after this phase the rendering layer has zero knowledge of
+            on-disk shape.
+          </p>
+
+          <h3>Decisions locked</h3>
+          <ul>
+            <li>Move all YAML extraction into <a class="file-ref">@src/parsers/state.ts</a></li>
+            <li>Reject the "lazy field" idea — every parsed field maps to a UI element (see D7)</li>
+            <li>Keep mtime evidence as raw seconds; let the view format it</li>
+          </ul>
+
+          <div class="task-callout">
+            <div class="task-name">Open question</div>
+            What happens when frontmatter parses but `phase` does not match
+            the directory name? Provisional answer: trust the directory,
+            warn in evidence chip.
+          </div>
+
+          <h3>Out of scope</h3>
+          <ul>
+            <li>SUMMARY body extraction beyond the Self-Check regex</li>
+            <li>Markdown rendering inside this stage drawer (rendered live in the discuss view itself)</li>
+          </ul>
+        </div>
+
+        <div class="drawer-footer">
+          <span class="truncated">showing first 42 lines of 87</span>
+          <span>
+            <span class="open-editor">open in editor →</span>
+            <span class="copy-path">⧉ copy path</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+  SCREEN 3 — EMPTY STATE: NEWBORN PLANNING
+══════════════════════════════════════════════════════════════ -->
+<div class="screen-wrap">
+  <div class="screen-label">screen 3 · newborn-planning empty state <span class="hint">(.planning/ exists; phases/ empty)</span></div>
+  <div class="screen">
+
+    <div class="topbar">
+      <span class="brand">vigil</span>
+      <span class="brand-dot">·</span>
+      <span class="project-path">~/project/foo</span>
+    </div>
+
+    <div class="empty">
+      <div class="empty-content">
+        <div class="empty-title">this project is between<br>discuss and plan.</div>
+        <div class="empty-sub">no phases yet — the candle is lit, the page is blank.</div>
+
+        <div class="empty-evidence">
+          <div class="ev-label">Evidence so far</div>
+          <div class="ev-row has"><span class="ev-glyph">✓</span>PROJECT.md</div>
+          <div class="ev-row has"><span class="ev-glyph">✓</span>REQUIREMENTS.md</div>
+          <div class="ev-row has"><span class="ev-glyph">✓</span>STATE.md</div>
+          <div class="ev-row miss"><span class="ev-glyph">○</span>ROADMAP.md</div>
+          <div class="ev-row miss"><span class="ev-glyph">○</span>phases/</div>
+        </div>
+
+        <div class="empty-hint">
+          run <code>/gsd-plan-phase</code> to produce the first phase.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+/* Night-watch palette — locked by Q19 (research/04-implementation-choices.md). */
+
+:root {
+  /* ─── Surfaces ─── */
+  --bg:               #181410;   /* warm dark ink, brown-leaning */
+  --bg-elev:          #1f1a16;   /* slight lift for drawer / cards */
+
+  /* ─── Foreground ─── */
+  --fg:               #e8e1d3;   /* aged paper */
+  --fg-muted:         rgba(232, 225, 211, 0.45);
+  --fg-faint:         rgba(232, 225, 211, 0.18);
+  --fg-ghost:         rgba(232, 225, 211, 0.08);
+
+  /* ─── Lines ─── */
+  --hairline:         rgba(232, 225, 211, 0.08);
+  --hairline-strong:  rgba(232, 225, 211, 0.14);
+
+  /* ─── Accents ─── */
+  --accent:           #d4a04f;   /* candle amber — the only "alive" color */
+  --success:          #7d9070;   /* sage — done */
+  --failure:          #c46856;   /* dusty terracotta — failed */
+
+  /* ─── Type stack ─── */
+  --font-display:     'Fraunces', Georgia, serif;
+  /* IBM Plex Mono is the stand-in until Commit Mono is self-hosted. */
+  --font-mono:        'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}

@@ -1,0 +1,8 @@
+/*
+  Fraunces is loaded via index.html <link> from Google Fonts.
+  Commit Mono will be self-hosted later; until then IBM Plex Mono is
+  loaded from the same Google Fonts <link> and used as a stand-in.
+
+  This file exists as the canonical place to add @font-face rules for
+  Commit Mono when its files land under src/client/fonts/.
+*/
