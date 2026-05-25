@@ -25,7 +25,7 @@ describe('assemblePhase', () => {
         { plan: plan({ plan: '01' }), summary: { failureMarker: 'PASSED' } },
         { plan: plan({ plan: '02' }), summary: { failureMarker: null } },
       ],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     expect(out.plans.map((p) => p.status)).toEqual(['done', 'done']);
     expect(out.failedPlanCount).toBe(0);
@@ -37,7 +37,7 @@ describe('assemblePhase', () => {
       phaseMtime: 1000,
       stateActivePhase: '04-thing',
       plans: [{ plan: plan({ plan: '01' }), summary: null }],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     expect(out.plans[0]!.status).toBe('running');
   });
@@ -48,7 +48,7 @@ describe('assemblePhase', () => {
       phaseMtime: 1000,
       stateActivePhase: '05-something-else',
       plans: [{ plan: plan({ plan: '01' }), summary: null }],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     expect(out.plans[0]!.status).toBe('pending');
   });
@@ -62,7 +62,7 @@ describe('assemblePhase', () => {
         { plan: plan({ plan: '01' }), summary: { failureMarker: 'FAILED' } },
         { plan: plan({ plan: '02' }), summary: { failureMarker: 'PASSED' } },
       ],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     expect(out.plans[0]!.status).toBe('failed');
     expect(out.failedPlanCount).toBe(1);
@@ -78,7 +78,7 @@ describe('assemblePhase', () => {
         { plan: plan({ plan: '02', wave: 1 }), summary: null },
         { plan: plan({ plan: '03' }), summary: null },
       ],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     const waves = out.plans.map((p) => p.wave);
     expect(waves).toEqual([1, 1, 2]);
@@ -90,7 +90,7 @@ describe('assemblePhase', () => {
       phaseMtime: 0,
       stateActivePhase: '3',
       plans: [{ plan: plan({ phase: '03-foo', plan: '01' }), summary: null }],
-      stagePresence: { execute: true },
+      stagePresence: { execute: "phases/01-x/01-01-SUMMARY.md" },
     });
     expect(out.plans[0]!.status).toBe('running');
   });

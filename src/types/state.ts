@@ -33,7 +33,7 @@ export interface Phase {
   id: string;            // phase directory basename, e.g. "04-cabinet-layout"
   number: string;        // "4.5"
   name: string;          // "Code Quality"
-  stages: { name: StageName; status: StageStatus }[];
+  stages: { name: StageName; status: StageStatus; artifactPath?: string }[];
   plans: Plan[];
   failedPlanCount: number;
 }

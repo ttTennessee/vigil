@@ -38,11 +38,15 @@ function newestMtime(dir: string): number {
   return newest;
 }
 
-function detectStagePresence(files: string[]): Partial<Record<StageName, boolean>> {
-  const out: Partial<Record<StageName, boolean>> = {};
+function detectStagePresence(
+  files: string[],
+  phaseRelativeDir: string,
+): Partial<Record<StageName, string>> {
+  const out: Partial<Record<StageName, string>> = {};
   for (const stage of STAGE_ORDER) {
     const hints = STAGE_FILE_HINTS[stage];
-    if (files.some((f) => hints.some((re) => re.test(f)))) out[stage] = true;
+    const match = files.find((f) => hints.some((re) => re.test(f)));
+    if (match) out[stage] = `${phaseRelativeDir}/${match}`;
   }
   return out;
 }
@@ -95,7 +99,7 @@ function assemblePhaseFromDir(
     phaseMtime: newestMtime(phaseDir),
     stateActivePhase,
     plans,
-    stagePresence: detectStagePresence(files),
+    stagePresence: detectStagePresence(files, `phases/${phaseId}`),
     planNames,
   });
 }

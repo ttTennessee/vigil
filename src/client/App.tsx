@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { StateResponse } from '../types/state.ts';
+import type { StageName, StateResponse } from '../types/state.ts';
 import { TopBar } from './components/TopBar.js';
 import { StagesColumn } from './components/StagesColumn.js';
 import { PlansColumn } from './components/PlansColumn.js';
 import { EmptyState } from './components/EmptyState.js';
+import { ArtifactDrawer } from './components/ArtifactDrawer.js';
 
 type FetchState =
   | { kind: 'loading' }
@@ -12,6 +13,7 @@ type FetchState =
 
 export default function App() {
   const [fs, setFs] = useState<FetchState>({ kind: 'loading' });
+  const [selectedStage, setSelectedStage] = useState<StageName>('execute');
 
   useEffect(() => {
     let cancelled = false;
@@ -84,12 +86,30 @@ export default function App() {
 
   const state = res.state;
   const phase = state.phases[0];
+  const activeStage = phase?.stages.find((s) => s.name === selectedStage);
+  const showDrawer = !!phase && selectedStage !== 'execute' && !!activeStage?.artifactPath;
   return (
     <div className="vigil-shell">
       <TopBar state={state} />
       <div className="body-grid">
-        {phase ? <StagesColumn phase={phase} /> : <aside className="stages" />}
-        {phase ? <PlansColumn phase={phase} /> : <main className="main" />}
+        {phase ? (
+          <StagesColumn
+            phase={phase}
+            selected={selectedStage}
+            onSelect={setSelectedStage}
+          />
+        ) : (
+          <aside className="stages" />
+        )}
+        {phase ? (
+          showDrawer ? (
+            <ArtifactDrawer artifactPath={activeStage!.artifactPath!} />
+          ) : (
+            <PlansColumn phase={phase} />
+          )
+        ) : (
+          <main className="main" />
+        )}
       </div>
     </div>
   );

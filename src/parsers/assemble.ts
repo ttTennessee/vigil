@@ -16,7 +16,10 @@ export interface PhaseInput {
   phaseMtime: number;       // epoch seconds — newest file mtime in the dir
   stateActivePhase?: string; // STATE.activePhase value (frontmatter), if any
   plans: { plan: ParsedPlan; summary: ParsedSummary | null }[];
-  stagePresence: Partial<Record<StageName, boolean>>;
+  // Value is the artifact path (relative to .planning/) for the stage, when
+  // present. Empty / missing entries mean the stage has no artifact on disk.
+  // Truthiness drives "is this stage done"; the path itself drives the drawer.
+  stagePresence: Partial<Record<StageName, string>>;
   planNames?: Record<string, string>;  // keyed by short plan id (e.g. "03-01")
 }
 
@@ -102,8 +105,9 @@ export function assemblePhase(input: PhaseInput): AssembledPhase {
   const hasRunning = assembledPlans.some((p) => p.status === 'running');
   const anyExecutePresent = !!stagePresence.execute || assembledPlans.length > 0;
 
-  const stages: { name: StageName; status: StageStatus }[] = STAGE_ORDER.map((name) => {
-    const present = !!stagePresence[name];
+  const stages: { name: StageName; status: StageStatus; artifactPath?: string }[] = STAGE_ORDER.map((name) => {
+    const artifactPath = stagePresence[name];
+    const present = !!artifactPath;
     let status: StageStatus;
     if (name === 'execute') {
       if (hasRunning) status = 'current';
@@ -115,7 +119,7 @@ export function assemblePhase(input: PhaseInput): AssembledPhase {
     } else {
       status = present ? 'done' : 'pending';
     }
-    return { name, status };
+    return artifactPath ? { name, status, artifactPath } : { name, status };
   });
 
   const hasCurrent = stages.some((s) => s.status === 'current');

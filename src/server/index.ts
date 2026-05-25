@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import { resolve, sep } from 'node:path';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
@@ -24,6 +26,24 @@ app.get('/api/state', (c) => {
     res = assembleState(discovery.planningDir, discovery.projectPath);
   }
   return c.json(res);
+});
+
+app.get('/api/artifact', async (c) => {
+  if (discovery.kind === 'missing') return c.text('no .planning/', 404);
+  const requested = c.req.query('path');
+  if (!requested) return c.text('missing path', 400);
+
+  const root = discovery.planningDir;
+  const absolute = resolve(root, requested);
+  if (absolute !== root && !absolute.startsWith(root + sep)) {
+    return c.text('forbidden', 403);
+  }
+  try {
+    const body = await readFile(absolute, 'utf8');
+    return c.body(body, 200, { 'content-type': 'text/markdown; charset=utf-8' });
+  } catch {
+    return c.text('not found', 404);
+  }
 });
 
 app.get('/events', (c) =>
