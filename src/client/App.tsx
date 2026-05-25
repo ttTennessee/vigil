@@ -15,15 +15,44 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/state')
-      .then((r) => r.json())
-      .then((data: StateResponse) => {
-        if (!cancelled) setFs({ kind: 'ready', response: data });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) setFs({ kind: 'error', message: String(err) });
-      });
-    return () => { cancelled = true; };
+    let es: EventSource | null = null;
+    let reconnectTimer: number | null = null;
+
+    const fetchState = () => {
+      fetch('/api/state')
+        .then((r) => r.json())
+        .then((data: StateResponse) => {
+          if (!cancelled) setFs({ kind: 'ready', response: data });
+        })
+        .catch((err: unknown) => {
+          if (!cancelled) setFs({ kind: 'error', message: String(err) });
+        });
+    };
+
+    const connect = () => {
+      if (cancelled) return;
+      es = new EventSource('/events');
+      es.onopen = () => fetchState();
+      es.addEventListener('invalidate', () => fetchState());
+      es.onerror = () => {
+        if (es && es.readyState === EventSource.CLOSED) {
+          es.close();
+          es = null;
+          if (!cancelled) {
+            reconnectTimer = window.setTimeout(connect, 1000);
+          }
+        }
+      };
+    };
+
+    fetchState();
+    connect();
+
+    return () => {
+      cancelled = true;
+      if (reconnectTimer !== null) clearTimeout(reconnectTimer);
+      es?.close();
+    };
   }, []);
 
   if (fs.kind === 'loading') {
@@ -65,4 +94,3 @@ export default function App() {
     </div>
   );
 }
-
