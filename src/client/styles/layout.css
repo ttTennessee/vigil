@@ -399,6 +399,17 @@
   border-radius: 2px;
   padding: 12px 14px;
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline-strong) transparent;
+}
+.md-body pre::-webkit-scrollbar { height: 6px; }
+.md-body pre::-webkit-scrollbar-track { background: transparent; }
+.md-body pre::-webkit-scrollbar-thumb {
+  background: var(--hairline-strong);
+  border-radius: 3px;
+}
+.md-body pre:hover::-webkit-scrollbar-thumb {
+  background: rgba(232, 225, 211, 0.22);
 }
 .md-body pre code {
   background: none;
