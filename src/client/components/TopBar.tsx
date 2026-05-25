@@ -28,6 +28,9 @@ export function TopBar({ state }: { state: State }) {
           {phase.failedPlanCount} plan{phase.failedPlanCount === 1 ? '' : 's'} failed
         </button>
       )}
+      {state.warnings?.map((w) => (
+        <span key={w} className="warning-chip">{w}</span>
+      ))}
       {state.nextAction && (
         <span className="next-action">
           <span className="glyph">▶</span> {state.nextAction}

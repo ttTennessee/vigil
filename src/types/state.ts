@@ -45,6 +45,10 @@ export interface State {
   nextAction?: string;
   nextPhases?: string[];
   phases: Phase[];
+  // Non-fatal observations the UI surfaces as a small evidence chip in the
+  // topbar — e.g. STATE.md missing or unparseable. D7: degrade quietly, no
+  // popups, just a chip.
+  warnings?: string[];
 }
 
 export type EmptyVariant = 'no-planning' | 'newborn-planning' | 'partial-planning';

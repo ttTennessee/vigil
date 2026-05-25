@@ -129,6 +129,13 @@ export function assembleState(planningDir: string, projectPath: string): StateRe
 
   const parsedState = stateText ? parseState(stateText) : {};
 
+  const warnings: string[] = [];
+  if (stateText === null) {
+    warnings.push('no STATE.md');
+  } else if (Object.keys(parsedState).length === 0) {
+    warnings.push('STATE.md unparseable');
+  }
+
   const roadmapText = safeRead(join(planningDir, 'ROADMAP.md'));
   if (!roadmapText) {
     console.warn(
@@ -155,6 +162,7 @@ export function assembleState(planningDir: string, projectPath: string): StateRe
   else if (activePhaseId) state.activePhase = activePhaseId;
   if (parsedState.nextAction !== undefined) state.nextAction = parsedState.nextAction;
   if (parsedState.nextPhases !== undefined) state.nextPhases = parsedState.nextPhases;
+  if (warnings.length) state.warnings = warnings;
 
   return { kind: 'state', state };
 }

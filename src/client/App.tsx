@@ -3,6 +3,7 @@ import type { StateResponse } from '../types/state.ts';
 import { TopBar } from './components/TopBar.js';
 import { StagesColumn } from './components/StagesColumn.js';
 import { PlansColumn } from './components/PlansColumn.js';
+import { EmptyState } from './components/EmptyState.js';
 
 type FetchState =
   | { kind: 'loading' }
@@ -49,7 +50,7 @@ export default function App() {
 
   const res = fs.response;
   if (res.kind === 'empty') {
-    return <EmptyView variant={res.empty.variant} projectPath={res.empty.projectPath} />;
+    return <EmptyState empty={res.empty} />;
   }
 
   const state = res.state;
@@ -65,26 +66,3 @@ export default function App() {
   );
 }
 
-function EmptyView({ variant, projectPath }: { variant: string; projectPath: string }) {
-  const titles: Record<string, [string, string]> = {
-    'no-planning':      ['no .planning/ found.',          'point vigil at a project, or run a workflow that creates one.'],
-    'newborn-planning': ['this project is between\ndiscuss and plan.', 'no phases yet — the candle is lit, the page is blank.'],
-    'partial-planning': ['planning is partially formed.', 'showing what could be parsed.'],
-  };
-  const [title, sub] = titles[variant] ?? titles['no-planning']!;
-  return (
-    <div className="vigil-shell">
-      <header className="topbar">
-        <span className="brand">vigil</span>
-        <span className="brand-dot">·</span>
-        <span className="project-path">{projectPath}</span>
-      </header>
-      <main className="empty">
-        <div className="empty-content">
-          <h1 className="empty-title">{title.split('\n').map((l, i) => <span key={i}>{l}<br/></span>)}</h1>
-          <p className="empty-sub">{sub}</p>
-        </div>
-      </main>
-    </div>
-  );
-}

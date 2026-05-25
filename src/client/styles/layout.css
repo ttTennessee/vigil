@@ -76,6 +76,16 @@
   cursor: pointer;
   background: none;
 }
+.warning-chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 2px 9px;
+  color: var(--fg-muted);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 2px;
+  white-space: nowrap;
+}
 
 /* ─── Body grid ─── */
 .body-grid {
@@ -234,5 +244,46 @@
   font-style: italic;
   font-size: 14px;
   color: var(--fg-muted);
-  margin: 0;
+  margin: 0 0 32px;
+}
+.empty-evidence {
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+}
+.empty-evidence .ev-label {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 14;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  margin-bottom: 12px;
+}
+.ev-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 12.5px;
+}
+.ev-row.has { color: var(--fg); }
+.ev-row.miss { color: var(--fg-faint); }
+.ev-row .ev-glyph {
+  font-family: var(--font-mono);
+  width: 14px;
+}
+.ev-row.has .ev-glyph { color: var(--success); }
+.empty-hint {
+  margin-top: 32px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.empty-hint code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: rgba(212, 160, 79, 0.06);
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid rgba(212, 160, 79, 0.18);
 }

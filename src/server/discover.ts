@@ -12,7 +12,17 @@ function planningAt(dir: string): string | null {
   return null;
 }
 
-export function findPlanningDir(cwd: string, explicit?: string): DiscoveryResult {
+export interface FindPlanningOpts {
+  // Walk ceiling (inclusive). Defaults to the user's `$HOME` per Q13.
+  // Exposed so tests can supply a tmp-dir ceiling without touching env vars.
+  homeDir?: string;
+}
+
+export function findPlanningDir(
+  cwd: string,
+  explicit?: string,
+  opts: FindPlanningOpts = {},
+): DiscoveryResult {
   if (explicit) {
     const abs = isAbsolute(explicit) ? explicit : resolve(cwd, explicit);
     const p = planningAt(abs);
@@ -20,7 +30,7 @@ export function findPlanningDir(cwd: string, explicit?: string): DiscoveryResult
     return { kind: 'missing', searchedFrom: abs };
   }
 
-  const ceiling = homedir();
+  const ceiling = opts.homeDir ?? homedir();
   let cur = resolve(cwd);
   while (true) {
     const p = planningAt(cur);
