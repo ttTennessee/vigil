@@ -14,6 +14,7 @@ export type PlanStatus = 'done' | 'running' | 'pending' | 'failed';
 
 export interface Plan {
   id: string;            // {phase}-{plan}, e.g. "4.5-03"
+  name?: string;         // human-readable, sourced from ROADMAP.md plan line
   phase: string;
   plan: string;
   wave: number;

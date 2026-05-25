@@ -5,42 +5,49 @@
   "type": "module",
   "description": "A quiet, file-watched dashboard for coding-agent workflows.",
   "license": "MIT",
-  "engines": { "node": ">=20" },
-  "bin": { "vigil": "./dist/server/index.js" },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "vigil": "./dist/server/index.js"
+  },
   "scripts": {
     "dev:server": "tsx watch src/server/index.ts",
     "dev:client": "vite",
-    "dev":        "concurrently -k -n srv,web -c green,cyan \"npm:dev:server\" \"npm:dev:client\"",
+    "dev": "concurrently -k -n srv,web -c green,cyan \"npm:dev:server\" \"npm:dev:client\"",
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
-    "build":        "npm run build:client && npm run build:server",
-    "start":      "node dist/server/index.js",
-    "typecheck":  "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json --noEmit",
-    "lint":       "eslint src --max-warnings=0"
+    "build": "npm run build:client && npm run build:server",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.0",
-    "chokidar":          "^4.0.0",
-    "gray-matter":       "^4.0.3",
-    "hono":              "^4.6.0",
-    "motion":            "^11.11.0",
-    "react":             "^19.0.0",
-    "react-dom":         "^19.0.0",
-    "react-markdown":    "^9.0.1",
-    "rehype-raw":        "^7.0.0",
-    "rehype-sanitize":   "^6.0.0",
-    "remark-gfm":        "^4.0.0"
+    "chokidar": "^4.0.0",
+    "gray-matter": "^4.0.3",
+    "hono": "^4.6.0",
+    "motion": "^11.11.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.1",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node":          "^22.0.0",
-    "@types/react":         "^19.0.0",
-    "@types/react-dom":     "^19.0.0",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.0",
-    "concurrently":         "^9.0.0",
-    "eslint":               "^9.0.0",
-    "tsx":                  "^4.19.0",
-    "typescript":           "^5.6.0",
-    "typescript-eslint":    "^8.0.0",
-    "vite":                 "^5.4.0"
+    "concurrently": "^9.0.0",
+    "eslint": "^9.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.9"
   }
 }
