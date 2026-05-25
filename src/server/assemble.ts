@@ -75,6 +75,13 @@ function assemblePhaseFromDir(
     const summaryName = `${m[1]}-${m[2]}-SUMMARY.md`;
     const planText = safeRead(join(phaseDir, planFile)) ?? '';
     const parsedPlan = parsePlan(planText);
+    // Filename is the canonical source of the plan id. GSD projects are not
+    // consistent in frontmatter: some use `phase: 01-foo, plan: 01`, others
+    // `phase: 2, plan: 02-01`, plus YAML drops zero-pads on bare integers.
+    // The filename (e.g. "02-01-PLAN.md") always has the canonical short id,
+    // and ROADMAP.md keys use the same form — so override both fields.
+    parsedPlan.phase = m[1]!;
+    parsedPlan.plan = m[2]!;
     let parsedSummary = null;
     if (summaryFiles.has(summaryName)) {
       const sumText = safeRead(join(phaseDir, summaryName)) ?? '';
