@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from 'node:fs/promises';
-import { resolve, sep } from 'node:path';
+import { dirname, extname, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
@@ -125,6 +126,44 @@ app.get('/events', (c) =>
     broadcaster.remove(stream);
   }),
 );
+
+// Serve the built SPA. Catch-all sits AFTER /api/* and /events so those win.
+// In dev (tsx watch) the dist/client bundle doesn't exist — Vite serves the
+// client on :5173 and proxies /api here, so this branch is unused there.
+const clientRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../client');
+const MIME: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.js':   'text/javascript; charset=utf-8',
+  '.css':  'text/css; charset=utf-8',
+  '.svg':  'image/svg+xml',
+  '.png':  'image/png',
+  '.ico':  'image/x-icon',
+  '.woff2':'font/woff2',
+  '.woff': 'font/woff',
+  '.json': 'application/json',
+  '.map':  'application/json',
+};
+
+app.get('*', async (c) => {
+  const pathname = new URL(c.req.url).pathname;
+  const rel = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
+  const absolute = resolve(clientRoot, rel);
+  if (absolute !== clientRoot && !absolute.startsWith(clientRoot + sep)) {
+    return c.text('forbidden', 403);
+  }
+  try {
+    const body = await readFile(absolute);
+    const type = MIME[extname(absolute)] ?? 'application/octet-stream';
+    return c.body(body, 200, { 'content-type': type });
+  } catch {
+    try {
+      const html = await readFile(resolve(clientRoot, 'index.html'));
+      return c.body(html, 200, { 'content-type': 'text/html; charset=utf-8' });
+    } catch {
+      return c.text('client bundle missing — run `npm run build`', 500);
+    }
+  }
+});
 
 const port = 7171;
 serve({ fetch: app.fetch, port });
