@@ -118,7 +118,11 @@ function pickActivePhase(phaseDirs: string[], stateActivePhase: string | undefin
   return phaseDirs[phaseDirs.length - 1];
 }
 
-export function assembleState(planningDir: string, projectPath: string): StateResponse {
+export function assembleState(
+  planningDir: string,
+  projectPath: string,
+  openUrlTemplate?: string,
+): StateResponse {
   const stateText = safeRead(join(planningDir, 'STATE.md'));
   const phasesRoot = join(planningDir, 'phases');
 
@@ -166,8 +170,10 @@ export function assembleState(planningDir: string, projectPath: string): StateRe
 
   const state: State = {
     projectPath,
+    planningDir,
     phases,
   };
+  if (openUrlTemplate) state.openUrlTemplate = openUrlTemplate;
   if (parsedState.milestone !== undefined) state.milestone = parsedState.milestone;
   if (parsedState.activePhase !== undefined) state.activePhase = parsedState.activePhase;
   else if (activePhaseId) state.activePhase = activePhaseId;

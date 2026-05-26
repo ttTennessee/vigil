@@ -4,6 +4,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import type { StateResponse } from '../types/state.ts';
+import { validateTemplate } from '../parsers/openInEditor.js';
 import { findPlanningDir } from './discover.js';
 import { assembleState } from './assemble.js';
 import { createWatcher } from './watcher.js';
@@ -11,6 +12,18 @@ import { SSEBroadcaster } from './sse.js';
 
 const explicit = process.argv[2];
 const discovery = findPlanningDir(process.cwd(), explicit);
+
+const rawOpenUrl = process.env.VIGIL_OPEN_URL;
+const validated = validateTemplate(rawOpenUrl);
+if (!validated.ok) {
+  console.warn(
+    `vigil: VIGIL_OPEN_URL=${JSON.stringify(rawOpenUrl)} ignored — ${validated.reason}. ` +
+    `Falling back to default vscode://file/%s.`,
+  );
+}
+// Only forward a template to the client when it differs from the default;
+// the client's openInEditor() applies the default on its own.
+const openUrlTemplate = validated.ok && rawOpenUrl ? validated.template : undefined;
 
 const app = new Hono();
 const broadcaster = new SSEBroadcaster();
@@ -23,7 +36,7 @@ app.get('/api/state', (c) => {
       empty: { variant: 'no-planning', projectPath: discovery.searchedFrom },
     };
   } else {
-    res = assembleState(discovery.planningDir, discovery.projectPath);
+    res = assembleState(discovery.planningDir, discovery.projectPath, openUrlTemplate);
   }
   return c.json(res);
 });

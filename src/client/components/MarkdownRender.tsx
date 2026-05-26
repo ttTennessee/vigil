@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -6,9 +5,22 @@ import rehypeSanitize from 'rehype-sanitize';
 import remarkFileRef from '../markdown/remarkFileRef.js';
 import { sanitizeSchema } from '../markdown/sanitizeSchema.js';
 import { nodeText, slugify } from '../lib/slug.js';
+import { openInEditor } from '../../parsers/openInEditor.js';
+import { CopyPathButton } from './CopyPathButton.js';
 
 interface Props {
   body: string;
+  // Absolute path to resolve relative @file/path refs against (the project
+  // root). When omitted, file-ref clicks fall back to a console log.
+  resolveRoot?: string;
+  openUrlTemplate?: string;
+}
+
+function resolveFilePath(root: string | undefined, raw: string): string | null {
+  if (!raw) return null;
+  if (raw.startsWith('/')) return raw;
+  if (!root) return null;
+  return `${root.replace(/\/$/, '')}/${raw}`;
 }
 
 type ChildProps = { children?: React.ReactNode };
@@ -35,12 +47,7 @@ const calloutLabels: Record<string, string> = {
   context: 'Context',
 };
 
-export function MarkdownRender({ body }: Props) {
-  const onFileClick = useCallback((path: string) => {
-    // Stub for issue #7: real action will open the file in the user's editor.
-    console.log('[vigil] file-ref click', path);
-  }, []);
-
+export function MarkdownRender({ body, resolveRoot, openUrlTemplate }: Props) {
   // react-markdown's `components` prop is loosely typed — cast to any per
   // upstream guidance for custom tag mappings.
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -52,22 +59,17 @@ export function MarkdownRender({ body }: Props) {
       <h3 id={slugify(nodeText(children))}>{children}</h3>
     ),
     'file-ref': (props: { dataPath?: string; 'data-path'?: string; children?: React.ReactNode }) => {
-      const path = props.dataPath ?? props['data-path'] ?? '';
+      const raw = props.dataPath ?? props['data-path'] ?? '';
+      const abs = resolveFilePath(resolveRoot, raw);
+      if (!abs) {
+        return <span className="file-ref">{props.children}</span>;
+      }
+      const href = openInEditor(abs, openUrlTemplate);
       return (
-        <span
-          className="file-ref"
-          role="link"
-          tabIndex={0}
-          onClick={() => onFileClick(path)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              onFileClick(path);
-            }
-          }}
-        >
-          {props.children}
-        </span>
+        <>
+          <a className="file-ref" href={href}>{props.children}</a>
+          <CopyPathButton absPath={abs} variant="inline" />
+        </>
       );
     },
   };

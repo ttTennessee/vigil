@@ -1,10 +1,15 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { preprocessGsdTags, splitFrontmatter, truncateMarkdown } from '../../parsers/markdown.js';
+import { openInEditor } from '../../parsers/openInEditor.js';
 import { FrontmatterCard } from './FrontmatterCard.js';
 import { MarkdownRender } from './MarkdownRender.js';
+import { CopyPathButton } from './CopyPathButton.js';
 
 interface Props {
   artifactPath: string;        // relative to .planning/
+  planningDir: string;         // absolute path of .planning/
+  projectPath: string;         // absolute project root (for @file/path refs)
+  openUrlTemplate?: string;
   scrollToSlugs?: string[];    // first slug matching a heading id wins
 }
 
@@ -13,7 +18,13 @@ type Fetch =
   | { kind: 'error'; message: string }
   | { kind: 'ready'; text: string };
 
-export function ArtifactDrawer({ artifactPath, scrollToSlugs }: Props) {
+export function ArtifactDrawer({
+  artifactPath,
+  planningDir,
+  projectPath,
+  openUrlTemplate,
+  scrollToSlugs,
+}: Props) {
   const [fetchState, setFetchState] = useState<Fetch>({ kind: 'loading' });
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,6 +65,8 @@ export function ArtifactDrawer({ artifactPath, scrollToSlugs }: Props) {
   }, [fetchState, scrollToSlugs]);
 
   const title = artifactPath.split('/').pop() ?? artifactPath;
+  const absPath = `${planningDir.replace(/\/$/, '')}/${artifactPath}`;
+  const editorHref = openInEditor(absPath, openUrlTemplate);
 
   if (fetchState.kind === 'loading') {
     return (
@@ -87,26 +100,22 @@ export function ArtifactDrawer({ artifactPath, scrollToSlugs }: Props) {
         <span className="drawer-meta">{totalLines} lines</span>
       </div>
       <FrontmatterCard frontmatter={frontmatter} />
-      <MarkdownRender body={body} />
-      {truncated && (
-        <div className="drawer-footer">
-          <span className="truncated">
-            showing first {shownLines} lines of {totalLines}
-          </span>
-          <span>
-            <a
-              href="#"
-              className="open-editor"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('[vigil] open-in-editor', artifactPath);
-              }}
-            >
-              open in editor →
-            </a>
-          </span>
-        </div>
-      )}
+      <MarkdownRender
+        body={body}
+        resolveRoot={projectPath}
+        openUrlTemplate={openUrlTemplate}
+      />
+      <div className="drawer-footer">
+        <span className="truncated">
+          {truncated ? `showing first ${shownLines} lines of ${totalLines}` : ''}
+        </span>
+        <span className="drawer-footer-actions">
+          <a href={editorHref} className="open-editor">
+            open in editor →
+          </a>
+          <CopyPathButton absPath={absPath} variant="footer" />
+        </span>
+      </div>
     </div>
   );
 }

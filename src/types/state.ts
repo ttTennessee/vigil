@@ -40,6 +40,14 @@ export interface Phase {
 
 export interface State {
   projectPath: string;
+  // Absolute path of the .planning/ directory; clients join artifactPath
+  // (which is .planning/-relative) against it to get an absolute file path
+  // for the editor-open URL.
+  planningDir: string;
+  // URL-scheme template forwarded from the server's VIGIL_OPEN_URL env var
+  // (validated at boot). Omitted when the default is in effect; clients
+  // fall back to vscode://file/%s in openInEditor() either way.
+  openUrlTemplate?: string;
   milestone?: string;
   activePhase?: string;
   nextAction?: string;

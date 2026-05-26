@@ -15,9 +15,19 @@ interface MdNode {
   data?: { hName?: string; hProperties?: Record<string, unknown> };
 }
 
-// Path-ish characters: letters, digits, slash, dot, dash, underscore.
-// Stops at whitespace, common punctuation, end-of-string.
-const FILE_RE = /@([A-Za-z0-9._/-]+)/g;
+// Two forms:
+//   1. Bare:     @some/path/file.md   — stops at whitespace or sentence
+//                punctuation. Path-ish chars include unicode letters and
+//                digits (\p{L}\p{N}) so paths like `@.planning/中文.md`
+//                match end-to-end.
+//   2. Bracketed: @<some/path with spaces.md> — used when the path embeds
+//                spaces, parens, or other punctuation that would otherwise
+//                terminate the bare form. The brackets are stripped from
+//                the captured path; only what's inside reaches the editor.
+//
+// The bracketed alternation comes first so `@<x>` doesn't get half-matched
+// by the bare branch.
+const FILE_RE = /@<([^>\n]+)>|@([\p{L}\p{N}._/-]+)/gu;
 
 export default function remarkFileRef() {
   return (tree: MdNode) => {
@@ -51,12 +61,16 @@ function splitText(text: string): MdNode[] | null {
   while ((m = FILE_RE.exec(text))) {
     matched = true;
     const start = m.index;
-    const path = m[1]!;
+    // Group 1: bracketed form (path inside `@<...>`); group 2: bare form.
+    const path = (m[1] ?? m[2])!;
+    // Label preserves the original surface form so readers see what they
+    // typed — bracketed paths render with the angle brackets intact.
+    const label = m[1] !== undefined ? `@<${path}>` : `@${path}`;
     if (start > last) out.push({ type: 'text', value: text.slice(last, start) });
     out.push({
       type: 'link',
       url: '',
-      children: [{ type: 'text', value: `@${path}` }],
+      children: [{ type: 'text', value: label }],
       data: {
         // Custom element name (must contain a hyphen so React + parse5
         // accept it as a custom element rather than a typo'd anchor).

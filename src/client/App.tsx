@@ -155,6 +155,9 @@ export default function App() {
           drawerPath ? (
             <ArtifactDrawer
               artifactPath={drawerPath}
+              planningDir={state.planningDir}
+              projectPath={state.projectPath}
+              openUrlTemplate={state.openUrlTemplate}
               scrollToSlugs={failureView ? FAILURE_SLUGS : undefined}
             />
           ) : (

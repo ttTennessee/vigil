@@ -503,6 +503,63 @@ button.chip {
   letter-spacing: 0.02em;
   text-decoration: none;
 }
+.drawer-footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── copy-path button (muted, never amber) ─── */
+.copy-path {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  color: var(--fg-muted);
+  font: inherit;
+  padding: 2px 6px;
+  margin: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1;
+  height: 18px;
+  min-width: 22px;
+}
+.copy-path:hover {
+  color: var(--fg);
+  border-color: var(--hairline-strong);
+}
+.copy-path:focus-visible {
+  outline: 1px solid var(--hairline-strong);
+  outline-offset: 1px;
+}
+.copy-path-icon {
+  font-size: 11px;
+}
+.copy-path--inline {
+  margin-left: 4px;
+  height: 16px;
+  min-width: 18px;
+  padding: 1px 4px;
+}
+.copy-path--inline .copy-path-icon {
+  font-size: 10px;
+}
+.copy-path-toast {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--hairline);
+  color: var(--fg-muted);
+  padding: 2px 6px;
+  font-size: 10px;
+  white-space: nowrap;
+  border-radius: 2px;
+  pointer-events: none;
+}
 
 /* ─── GSD section wrappers (non-callout custom tags) ─── */
 .md-body .gsd-section {
