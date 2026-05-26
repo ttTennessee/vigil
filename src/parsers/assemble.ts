@@ -1,4 +1,4 @@
-import type { Phase, Plan, PlanStatus, StageName, StageStatus } from '../types/state.ts';
+import type { Phase, Plan, PlanStatus, StageArtifact, StageName, StageStatus } from '../types/state.ts';
 import type { ParsedPlan } from './plan.ts';
 import type { ParsedSummary } from './summary.ts';
 
@@ -16,10 +16,10 @@ export interface PhaseInput {
   phaseMtime: number;       // epoch seconds — newest file mtime in the dir
   stateActivePhase?: string; // STATE.activePhase value (frontmatter), if any
   plans: { plan: ParsedPlan; summary: ParsedSummary | null }[];
-  // Value is the artifact path (relative to .planning/) for the stage, when
-  // present. Empty / missing entries mean the stage has no artifact on disk.
-  // Truthiness drives "is this stage done"; the path itself drives the drawer.
-  stagePresence: Partial<Record<StageName, string>>;
+  // All artifacts found per stage, each {label,path}. Missing / empty arrays
+  // mean the stage has no artifact on disk. Non-empty drives "is this stage
+  // done"; the array itself drives the StagesColumn expand sub-items.
+  stagePresence: Partial<Record<StageName, StageArtifact[]>>;
   planNames?: Record<string, string>;  // keyed by short plan id (e.g. "03-01")
 }
 
@@ -103,11 +103,12 @@ export function assemblePhase(input: PhaseInput): AssembledPhase {
   const failedPlanCount = assembledPlans.filter((p) => p.status === 'failed').length;
 
   const hasRunning = assembledPlans.some((p) => p.status === 'running');
-  const anyExecutePresent = !!stagePresence.execute || assembledPlans.length > 0;
+  const executeArtifacts = stagePresence.execute ?? [];
+  const anyExecutePresent = executeArtifacts.length > 0 || assembledPlans.length > 0;
 
-  const stages: { name: StageName; status: StageStatus; artifactPath?: string }[] = STAGE_ORDER.map((name) => {
-    const artifactPath = stagePresence[name];
-    const present = !!artifactPath;
+  const stages: { name: StageName; status: StageStatus; artifacts: StageArtifact[] }[] = STAGE_ORDER.map((name) => {
+    const artifacts = stagePresence[name] ?? [];
+    const present = artifacts.length > 0;
     let status: StageStatus;
     if (name === 'execute') {
       if (hasRunning) status = 'current';
@@ -119,7 +120,7 @@ export function assemblePhase(input: PhaseInput): AssembledPhase {
     } else {
       status = present ? 'done' : 'pending';
     }
-    return artifactPath ? { name, status, artifactPath } : { name, status };
+    return { name, status, artifacts };
   });
 
   const hasCurrent = stages.some((s) => s.status === 'current');
@@ -127,7 +128,8 @@ export function assemblePhase(input: PhaseInput): AssembledPhase {
     for (let i = stages.length - 1; i >= 0; i--) {
       if (stages[i]!.status === 'done') {
         if (i + 1 < stages.length) {
-          stages[i + 1] = { name: stages[i + 1]!.name, status: 'current' };
+          const next = stages[i + 1]!;
+          stages[i + 1] = { name: next.name, status: 'current', artifacts: next.artifacts };
         }
         break;
       }

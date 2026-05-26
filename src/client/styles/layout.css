@@ -390,6 +390,35 @@ button.chip {
   width: 2px;
   background: var(--accent);
 }
+.stage-name { flex: 1; }
+.stage-caret {
+  font-size: 11px;
+  color: var(--fg-faint);
+  width: 10px;
+  text-align: center;
+}
+.stage-sub {
+  padding: 6px 28px 6px 60px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  position: relative;
+}
+.stage-sub:hover { background: rgba(232, 225, 211, 0.025); color: var(--fg); }
+.stage-sub.selected {
+  color: var(--fg);
+  background: rgba(212, 160, 79, 0.06);
+}
+.stage-sub.selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--accent);
+}
 
 /* ─── Drawer ─── */
 .drawer {

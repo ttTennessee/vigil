@@ -24,6 +24,7 @@ function summaryPathFor(phaseId: string, plan: Plan): string {
 export default function App() {
   const [fs, setFs] = useState<FetchState>({ kind: 'loading' });
   const [selectedStage, setSelectedStage] = useState<StageName>('execute');
+  const [selectedArtifactPath, setSelectedArtifactPath] = useState<string | null>(null);
   // Set when the user clicks a failed plan's chip — overrides the
   // stage-driven drawer for that one plan's SUMMARY.
   const [failureView, setFailureView] = useState<{ path: string } | null>(null);
@@ -70,9 +71,10 @@ export default function App() {
     };
   }, []);
 
-  const handleSelectStage = useCallback((s: StageName) => {
+  const handleSelectStage = useCallback((s: StageName, path: string | null) => {
     setFailureView(null);
     setSelectedStage(s);
+    setSelectedArtifactPath(path);
   }, []);
 
   const handleOpenFailure = useCallback((plan: Plan) => {
@@ -91,6 +93,7 @@ export default function App() {
     // Make sure we're showing the plans column (close any drawer view).
     setFailureView(null);
     setSelectedStage('execute');
+    setSelectedArtifactPath(null);
     // Defer so the plans column has a chance to mount after a drawer close.
     requestAnimationFrame(() => {
       const el = document.getElementById(planRowId(firstFailed.id));
@@ -127,10 +130,9 @@ export default function App() {
 
   const state = res.state;
   const phase = state.phases[0];
-  const activeStage = phase?.stages.find((s) => s.name === selectedStage);
   const stageDrawerPath =
-    phase && selectedStage !== 'execute' && activeStage?.artifactPath
-      ? activeStage.artifactPath
+    phase && selectedStage !== 'execute' && selectedArtifactPath
+      ? selectedArtifactPath
       : null;
   // Failure-chip drawer takes priority over stage-driven drawer.
   const drawerPath = failureView?.path ?? stageDrawerPath;
@@ -145,7 +147,8 @@ export default function App() {
         {phase ? (
           <StagesColumn
             phase={phase}
-            selected={selectedStage}
+            selectedStage={selectedStage}
+            selectedPath={selectedArtifactPath}
             onSelect={handleSelectStage}
           />
         ) : (

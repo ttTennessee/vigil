@@ -29,11 +29,19 @@ export interface Plan {
   failureMarker?: 'PASSED' | 'FAILED' | null;
 }
 
+export interface StageArtifact {
+  // Sub-item label shown under an expanded stage row, e.g. "01-PLAN" or
+  // "DISCUSSION-LOG". Derived from the filename by stripping the phase
+  // prefix and ".md" extension.
+  label: string;
+  path: string;          // .planning/-relative
+}
+
 export interface Phase {
   id: string;            // phase directory basename, e.g. "04-cabinet-layout"
   number: string;        // "4.5"
   name: string;          // "Code Quality"
-  stages: { name: StageName; status: StageStatus; artifactPath?: string }[];
+  stages: { name: StageName; status: StageStatus; artifacts: StageArtifact[] }[];
   plans: Plan[];
   failedPlanCount: number;
 }

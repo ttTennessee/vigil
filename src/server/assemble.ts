@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import type { Phase, State, StateResponse, StageName } from '../types/state.ts';
+import type { Phase, StageArtifact, State, StateResponse, StageName } from '../types/state.ts';
 import { STAGE_ORDER, assemblePhase } from '../parsers/assemble.js';
 import { parsePlan } from '../parsers/plan.js';
 import { parseRoadmap } from '../parsers/roadmap.js';
@@ -38,15 +38,30 @@ function newestMtime(dir: string): number {
   return newest;
 }
 
+function artifactLabel(filename: string, phaseId: string): string {
+  // Strip ".md" and the leading "{phase}-" so per-plan files read like
+  // "01-PLAN" and phase-level files like "DISCUSSION-LOG".
+  const m = PHASE_DIR_RE.exec(phaseId);
+  const phaseNum = m ? m[1]! : phaseId;
+  const stem = filename.replace(/\.md$/i, '');
+  return stem.startsWith(`${phaseNum}-`) ? stem.slice(phaseNum.length + 1) : stem;
+}
+
 function detectStagePresence(
   files: string[],
   phaseRelativeDir: string,
-): Partial<Record<StageName, string>> {
-  const out: Partial<Record<StageName, string>> = {};
+  phaseId: string,
+): Partial<Record<StageName, StageArtifact[]>> {
+  const out: Partial<Record<StageName, StageArtifact[]>> = {};
   for (const stage of STAGE_ORDER) {
     const hints = STAGE_FILE_HINTS[stage];
-    const match = files.find((f) => hints.some((re) => re.test(f)));
-    if (match) out[stage] = `${phaseRelativeDir}/${match}`;
+    const matches = files.filter((f) => hints.some((re) => re.test(f)));
+    if (matches.length === 0) continue;
+    matches.sort();
+    out[stage] = matches.map((f) => ({
+      label: artifactLabel(f, phaseId),
+      path: `${phaseRelativeDir}/${f}`,
+    }));
   }
   return out;
 }
@@ -99,7 +114,7 @@ function assemblePhaseFromDir(
     phaseMtime: newestMtime(phaseDir),
     stateActivePhase,
     plans,
-    stagePresence: detectStagePresence(files, `phases/${phaseId}`),
+    stagePresence: detectStagePresence(files, `phases/${phaseId}`, phaseId),
     planNames,
   });
 }
