@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "bin": {
-    "vigil": "./dist/server/index.js"
+    "vigil": "./dist/server/server/index.js"
   },
   "scripts": {
     "dev:server": "tsx watch src/server/index.ts",
@@ -18,7 +18,7 @@
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
     "build": "npm run build:client && npm run build:server",
-    "start": "node dist/server/index.js",
+    "start": "node dist/server/server/index.js",
     "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json --noEmit",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run"

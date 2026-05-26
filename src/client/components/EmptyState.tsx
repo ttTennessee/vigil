@@ -1,4 +1,5 @@
 import type { EmptyResponse } from '../../types/state.ts';
+import { RecentSwitcher } from './RecentSwitcher.js';
 
 function shortenPath(p: string): string {
   const home = '/home/';
@@ -15,6 +16,7 @@ function Shell({ projectPath, children }: { projectPath: string; children: React
       <header className="topbar">
         <span className="brand">vigil</span>
         <span className="brand-dot">·</span>
+        <RecentSwitcher currentPath={projectPath} />
         <span className="project-path">{shortenPath(projectPath)}</span>
       </header>
       <main className="empty"><div className="empty-content">{children}</div></main>

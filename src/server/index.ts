@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { readFile } from 'node:fs/promises';
 import { resolve, sep } from 'node:path';
 import { serve } from '@hono/node-server';
@@ -5,13 +6,13 @@ import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import type { StateResponse } from '../types/state.ts';
 import { validateTemplate } from '../parsers/openInEditor.js';
-import { findPlanningDir } from './discover.js';
+import { findPlanningDir, type DiscoveryResult } from './discover.js';
 import { assembleState } from './assemble.js';
 import { createWatcher } from './watcher.js';
 import { SSEBroadcaster } from './sse.js';
+import { RecentStore } from './recent.js';
 
 const explicit = process.argv[2];
-const discovery = findPlanningDir(process.cwd(), explicit);
 
 const rawOpenUrl = process.env.VIGIL_OPEN_URL;
 const validated = validateTemplate(rawOpenUrl);
@@ -27,6 +28,36 @@ const openUrlTemplate = validated.ok && rawOpenUrl ? validated.template : undefi
 
 const app = new Hono();
 const broadcaster = new SSEBroadcaster();
+const recent = new RecentStore();
+
+// Mutable session state: switching projects swaps these out.
+let discovery: DiscoveryResult = findPlanningDir(process.cwd(), explicit);
+let closeWatcher: (() => void) | null = null;
+
+function syncRecentForDiscovery(requested: string | undefined, result: DiscoveryResult): void {
+  if (result.kind === 'found') {
+    recent.add(result.projectPath);
+  } else if (requested) {
+    // The user-supplied path didn't yield a usable .planning/ — drop it
+    // from recent if it was there (per issue #8 failure rule).
+    recent.remove(requested);
+  }
+}
+
+function openWatcherFor(result: DiscoveryResult): void {
+  if (closeWatcher) {
+    closeWatcher();
+    closeWatcher = null;
+  }
+  if (result.kind === 'found') {
+    closeWatcher = createWatcher(result.planningDir, () => {
+      broadcaster.broadcast();
+    });
+  }
+}
+
+syncRecentForDiscovery(explicit, discovery);
+openWatcherFor(discovery);
 
 app.get('/api/state', (c) => {
   let res: StateResponse;
@@ -39,6 +70,31 @@ app.get('/api/state', (c) => {
     res = assembleState(discovery.planningDir, discovery.projectPath, openUrlTemplate);
   }
   return c.json(res);
+});
+
+app.get('/api/recent', (c) => {
+  const current = discovery.kind === 'found' ? discovery.projectPath : null;
+  return c.json({ recent: recent.list(), current });
+});
+
+app.post('/api/switch', async (c) => {
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid JSON' }, 400);
+  }
+  const path = (body && typeof body === 'object' && typeof (body as { path?: unknown }).path === 'string')
+    ? (body as { path: string }).path
+    : null;
+  if (!path) return c.json({ error: 'missing path' }, 400);
+
+  const next = findPlanningDir(path, path);
+  discovery = next;
+  syncRecentForDiscovery(path, next);
+  openWatcherFor(next);
+  broadcaster.broadcast();
+  return c.json({ ok: true, kind: next.kind });
 });
 
 app.get('/api/artifact', async (c) => {
@@ -69,13 +125,6 @@ app.get('/events', (c) =>
     broadcaster.remove(stream);
   }),
 );
-
-let closeWatcher: (() => void) | null = null;
-if (discovery.kind === 'found') {
-  closeWatcher = createWatcher(discovery.planningDir, () => {
-    broadcaster.broadcast();
-  });
-}
 
 const port = 7171;
 serve({ fetch: app.fetch, port });

@@ -1,4 +1,5 @@
 import type { Phase, State } from '../../types/state.ts';
+import { RecentSwitcher } from './RecentSwitcher.js';
 
 function shortenPath(p: string): string {
   const home = '/home/';
@@ -26,6 +27,7 @@ export function TopBar({ state, onClickFailedCount }: Props) {
     <header className="topbar">
       <span className="brand">vigil</span>
       <span className="brand-dot">·</span>
+      <RecentSwitcher currentPath={state.projectPath} />
       <span className="project-path">{shortenPath(state.projectPath)}</span>
       {phase && <span className="phase-title">{phaseHeading(phase)}</span>}
       {phase && phase.failedPlanCount > 0 && (
