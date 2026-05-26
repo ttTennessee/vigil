@@ -15,7 +15,12 @@ function phaseHeading(phase: Phase | undefined): string {
   return `Phase ${phase.number} — ${name}`;
 }
 
-export function TopBar({ state }: { state: State }) {
+interface Props {
+  state: State;
+  onClickFailedCount?: () => void;
+}
+
+export function TopBar({ state, onClickFailedCount }: Props) {
   const phase = state.phases[0];
   return (
     <header className="topbar">
@@ -24,7 +29,7 @@ export function TopBar({ state }: { state: State }) {
       <span className="project-path">{shortenPath(state.projectPath)}</span>
       {phase && <span className="phase-title">{phaseHeading(phase)}</span>}
       {phase && phase.failedPlanCount > 0 && (
-        <button type="button" className="phase-summary-chip">
+        <button type="button" className="phase-summary-chip" onClick={onClickFailedCount}>
           {phase.failedPlanCount} plan{phase.failedPlanCount === 1 ? '' : 's'} failed
         </button>
       )}

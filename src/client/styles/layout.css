@@ -212,6 +212,33 @@
   color: var(--fg-faint);
   border-color: var(--hairline);
 }
+.chip.amber {
+  color: var(--accent);
+  border-color: rgba(212, 160, 79, 0.28);
+}
+.chip.amber.stale {
+  color: var(--failure);
+  border-color: rgba(196, 104, 86, 0.32);
+}
+.chip.human {
+  color: var(--accent);
+  border-color: rgba(212, 160, 79, 0.22);
+}
+.chip.failure {
+  color: var(--failure);
+  border-color: rgba(196, 104, 86, 0.35);
+  cursor: pointer;
+  background: none;
+}
+button.chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 2px 9px;
+  border-radius: 2px;
+  background: none;
+  cursor: pointer;
+}
 
 .files-hint {
   font-size: 10.5px;

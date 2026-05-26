@@ -5,6 +5,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkFileRef from '../markdown/remarkFileRef.js';
 import { sanitizeSchema } from '../markdown/sanitizeSchema.js';
+import { nodeText, slugify } from '../lib/slug.js';
 
 interface Props {
   body: string;
@@ -44,6 +45,12 @@ export function MarkdownRender({ body }: Props) {
   // upstream guidance for custom tag mappings.
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const components: any = {
+    h2: ({ children }: ChildProps) => (
+      <h2 id={slugify(nodeText(children))}>{children}</h2>
+    ),
+    h3: ({ children }: ChildProps) => (
+      <h3 id={slugify(nodeText(children))}>{children}</h3>
+    ),
     'file-ref': (props: { dataPath?: string; 'data-path'?: string; children?: React.ReactNode }) => {
       const path = props.dataPath ?? props['data-path'] ?? '';
       return (

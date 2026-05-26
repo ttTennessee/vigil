@@ -32,6 +32,7 @@ export const sanitizeSchema = {
       'class',
       'dataPath',
       'data-path',
+      'id',
     ],
     'file-ref': ['className', 'dataPath'],
   },

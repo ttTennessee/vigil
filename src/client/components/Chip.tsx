@@ -1,7 +1,25 @@
-import type { ReactNode } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
-type Variant = 'neutral' | 'req';
+type Variant = 'neutral' | 'req' | 'amber' | 'human' | 'failure';
 
-export function Chip({ variant = 'neutral', children }: { variant?: Variant; children: ReactNode }) {
-  return <span className={`chip ${variant === 'req' ? 'req' : ''}`}>{children}</span>;
+interface Props {
+  variant?: Variant;
+  stale?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  title?: string;
+  children: ReactNode;
+}
+
+export function Chip({ variant = 'neutral', stale, onClick, title, children }: Props) {
+  const classes = ['chip'];
+  if (variant !== 'neutral') classes.push(variant);
+  if (stale) classes.push('stale');
+  if (onClick) {
+    return (
+      <button type="button" className={classes.join(' ')} onClick={onClick} title={title}>
+        {children}
+      </button>
+    );
+  }
+  return <span className={classes.join(' ')} title={title}>{children}</span>;
 }
