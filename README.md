@@ -14,6 +14,20 @@ off.
 
 ---
 
+## Screens
+
+![Default — execute stage selected](docs/assets/swatch-screen-1.png)
+*Default — `execute` selected, plans grouped by wave.*
+
+![Discuss stage clicked — artifact drawer](docs/assets/swatch-screen-2.png)
+*A `discuss` artifact opened — middle column swaps to the drawer, left column stays.*
+
+![Newborn-planning empty state](docs/assets/swatch-screen-3.png)
+*Empty state — `.planning/` exists but `phases/` is empty.*
+
+<!-- Mockups generated from research/swatches/layout.html via scripts/screenshot-swatches.mjs -->
+
+
 ## What it does
 
 vigil watches a single `.planning/` directory — the on-disk format

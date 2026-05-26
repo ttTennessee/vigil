@@ -13,6 +13,19 @@ English: [README.md](README.md)
 
 ---
 
+## 截图
+
+![默认 — 选中 execute 阶段](docs/assets/swatch-screen-1.png)
+*默认状态 — 选中 `execute`，plans 按 wave 分组。*
+
+![点开 discuss 阶段的产物 — Artifact 抽屉](docs/assets/swatch-screen-2.png)
+*打开一个 `discuss` 产物 — 中间列切到抽屉视图，左侧 Stages 列保持可见。*
+
+![新建 .planning/ 的空状态](docs/assets/swatch-screen-3.png)
+*空状态 — `.planning/` 已存在但 `phases/` 还是空的。*
+
+<!-- 截图由 scripts/screenshot-swatches.mjs 从 research/swatches/layout.html 生成 -->
+
 ## 它是什么
 
 vigil 监听一个 `.planning/` 目录 —— 这是 [Get Shit Done (GSD)][gsd]
